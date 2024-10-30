@@ -9,7 +9,27 @@ function validNumber(value) {
 	return regex.test(value);
 }
 
-function dataDimensions(dataframe) {}
+function dataDimensions(dataframe) {
+	if (dataframe === undefined || dataframe === "") {
+		return [-1, -1];
+	}
+
+	result = Array.isArray(dataframe) && dataframe.every((item) => !Array.isArray(item));
+
+	if (result) {
+		let totalColumns = dataframe.length;
+		return [totalColumns, -1];
+	}
+
+	let totalColumns = dataframe.length;
+	let totalRows = 0;
+
+	for (let i = 0; i < dataframe.length; i++) {
+		totalRows += i;
+	}
+
+	return [totalRows, totalColumns];
+}
 
 function findTotal(dataset) {}
 
