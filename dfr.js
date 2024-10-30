@@ -31,7 +31,25 @@ function dataDimensions(dataframe) {
 	return [totalRows, totalColumns];
 }
 
-function findTotal(dataset) {}
+function findTotal(dataset) {
+	let total = 0;
+
+	const is2DArray = Array.isArray(dataset) && dataset.every((innerArray) => Array.isArray(innerArray));
+
+	if (is2DArray) {
+		return 0;
+	}
+
+	for (let i = 0; i < dataset.length; i++) {
+		if (!isNaN(dataset[i])) {
+			let temp = Number(dataset[i]);
+			total = total + temp;
+		} else {
+			continue;
+		}
+	}
+	return total;
+}
 
 function calculateMean(dataset) {}
 
