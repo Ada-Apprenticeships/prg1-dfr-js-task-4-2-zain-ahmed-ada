@@ -93,18 +93,17 @@ function calculateMedian(dataset) {
 }
 
 function convertToNumber(dataframe, col) {
-	// whatever col is you index that
+	let count = 0;
 
 	for (let i = 0; i < dataframe.length; i++) {
-		for (let j = 0; j < dataframe[i].length; j++) {
-			if (!isNaN(dataframe[j][col])) {
-				dataframe[j][col] = Number(dataframe[j][col]);
-				return dataframe[j][col];
-			} else {
-				continue;
-			}
+		if (!isNaN(dataframe[i][col])) {
+			dataframe[i][col] = Number(dataframe[i][col]);
+			count++;
+		} else {
+			continue;
 		}
 	}
+	return count;
 }
 
 function flatten(dataframe) {
@@ -153,7 +152,9 @@ function loadCSV(csvFile, ignoreRows, ignoreCols) {
 	return [tempArr, totalRows, totalColumns]; // TODO: Count totalRows properly and totalColumns I think totalRows
 }
 
-function createSlice(dataframe, columnIndex, pattern, exportColumns = []) {}
+function createSlice(dataframe, columnIndex, pattern, exportColumns = []) {
+	// something here
+}
 
 module.exports = {
 	fileExists,
