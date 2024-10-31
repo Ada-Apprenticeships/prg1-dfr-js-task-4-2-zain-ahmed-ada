@@ -73,7 +73,24 @@ function calculateMean(dataset) {
 	return total / len;
 }
 
-function calculateMedian(dataset) {}
+function calculateMedian(dataset) {
+	if (dataset.length === 1) {
+		return Number(dataset[0]);
+	}
+
+	if (dataset.length === 0) {
+		return 0;
+	}
+
+	midpoint = Math.round(dataset.length / 2);
+
+	if (midpoint % 2 === 0) {
+		let total = (Number(dataset[midpoint]) + Number(dataset[midpoint - 1])) / 2;
+		return Number(total);
+	} else {
+		return Number(dataset[midpoint - 1]);
+	}
+}
 
 function convertToNumber(dataframe, col) {}
 
@@ -111,7 +128,7 @@ function loadCSV(csvFile, ignoreRows, ignoreCols) {
 		totalColumns = -1;
 	}
 
-	return [tempArr, totalRows, totalColumns];
+	return [tempArr, totalRows, totalColumns]; // TODO: Count totalRows properly and totalColumns I think totalRows
 }
 
 function createSlice(dataframe, columnIndex, pattern, exportColumns = []) {}
