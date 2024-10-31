@@ -110,8 +110,12 @@ function flatten(dataframe) {
 	newArr = [];
 	for (let i = 0; i < dataframe.length; i++) {
 		for (let j = 0; j < dataframe[i].length; j++) {
-			console.log("done");
-			newArr.push(Number(dataframe[i]));
+			console.log(dataframe[i][j]);
+			if (!isNaN(dataframe[i][j])) {
+				newArr.push(Number(dataframe[i][j]));
+			} else {
+				continue;
+			}
 		}
 	}
 	return newArr;
@@ -124,36 +128,51 @@ function loadCSV(csvFile, ignoreRows, ignoreCols) {
 		let totalColumns = -1;
 		return [tempArr, totalRows, totalColumns];
 	}
+
 	const data = fs.readFileSync(csvFile, "utf-8");
 	const lines = data.split(/\n/);
 
 	let tempArr = [];
-	let totalRows = lines.length;
-	let totalColumns = lines.length;
+	let tempArr2 = [];
 
-	for (let line = 0; line < lines.length; line++) {
-		if (lines[line]) {
-			if (ignoreRows.includes(line)) {
-				continue;
-			}
-			let fields = lines[line].split(",");
+	for (let i = 0; i < lines.length; i++) {
+		tempArr.push(lines[i].split(","));
+	}
 
-			fields = fields.slice(ignoreCols.length);
-
-			tempArr.push(fields);
+	for (let i = 0; i < tempArr.length; i++) {
+		if (ignoreRows.includes(i)) {
+			continue;
 		}
+
+		const newRow = [];
+
+		for (let j = 0; j < tempArr[i].length; j++) {
+			if (!ignoreCols.includes(j)) {
+				newRow.push(tempArr[i][j]);
+			}
+		}
+
+		tempArr2.push(newRow);
 	}
 
-	if (tempArr.length === 0) {
-		totalRows = -1;
-		totalColumns = -1;
-	}
-
-	return [tempArr, totalRows, totalColumns]; // TODO: Count totalRows properly and totalColumns I think totalRows
+	let totalRows = tempArr2.length + 1;
+	let totalColumns = tempArr[0].length;
+	return [tempArr2, totalRows, totalColumns];
 }
 
 function createSlice(dataframe, columnIndex, pattern, exportColumns = []) {
-	// something here
+	let tempArr = [];
+
+	for (let i = 0; i < dataframe.length; i++) {
+		if (dataframe[i][columnIndex] === pattern) {
+			const selectedColumns = exportColumns.map((columnIndex) => dataframe[i][columnIndex]);
+			tempArr.push(selectedColumns);
+		} else if (pattern === "*") {
+			const selectedColumns = exportColumns.map((columnIndex) => dataframe[i][columnIndex]);
+			tempArr.push(selectedColumns);
+		}
+	}
+	return tempArr;
 }
 
 module.exports = {
