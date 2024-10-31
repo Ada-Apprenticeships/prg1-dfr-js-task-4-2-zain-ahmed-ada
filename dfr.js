@@ -51,7 +51,27 @@ function findTotal(dataset) {
 	return total;
 }
 
-function calculateMean(dataset) {}
+function calculateMean(dataset) {
+	let total = 0;
+	let len = dataset.length;
+
+	const is2DArray = Array.isArray(dataset) && dataset.every((innerArray) => Array.isArray(innerArray));
+
+	if (is2DArray) {
+		return 0;
+	}
+
+	for (let i = 0; i < dataset.length; i++) {
+		if (!isNaN(dataset[i])) {
+			let temp = Number(dataset[i]);
+			total = total + temp;
+		} else {
+			len--;
+			continue;
+		}
+	}
+	return total / len;
+}
 
 function calculateMedian(dataset) {}
 
