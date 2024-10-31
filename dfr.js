@@ -92,9 +92,31 @@ function calculateMedian(dataset) {
 	}
 }
 
-function convertToNumber(dataframe, col) {}
+function convertToNumber(dataframe, col) {
+	// whatever col is you index that
 
-function flatten(dataframe) {}
+	for (let i = 0; i < dataframe.length; i++) {
+		for (let j = 0; j < dataframe[i].length; j++) {
+			if (!isNaN(dataframe[j][col])) {
+				dataframe[j][col] = Number(dataframe[j][col]);
+				return dataframe[j][col];
+			} else {
+				continue;
+			}
+		}
+	}
+}
+
+function flatten(dataframe) {
+	newArr = [];
+	for (let i = 0; i < dataframe.length; i++) {
+		for (let j = 0; j < dataframe[i].length; j++) {
+			console.log("done");
+			newArr.push(Number(dataframe[i]));
+		}
+	}
+	return newArr;
+}
 
 function loadCSV(csvFile, ignoreRows, ignoreCols) {
 	if (csvFile === "./nonexistent.csv") {
