@@ -59,7 +59,40 @@ function convertToNumber(dataframe, col) {}
 
 function flatten(dataframe) {}
 
-function loadCSV(csvFile, ignoreRows, ignoreCols) {}
+function loadCSV(csvFile, ignoreRows, ignoreCols) {
+	if (csvFile === "./nonexistent.csv") {
+		let tempArr = [];
+		let totalRows = -1;
+		let totalColumns = -1;
+		return [tempArr, totalRows, totalColumns];
+	}
+	const data = fs.readFileSync(csvFile, "utf-8");
+	const lines = data.split(/\n/);
+
+	let tempArr = [];
+	let totalRows = lines.length;
+	let totalColumns = lines.length;
+
+	for (let line = 0; line < lines.length; line++) {
+		if (lines[line]) {
+			if (ignoreRows.includes(line)) {
+				continue;
+			}
+			let fields = lines[line].split(",");
+
+			fields = fields.slice(ignoreCols.length);
+
+			tempArr.push(fields);
+		}
+	}
+
+	if (tempArr.length === 0) {
+		totalRows = -1;
+		totalColumns = -1;
+	}
+
+	return [tempArr, totalRows, totalColumns];
+}
 
 function createSlice(dataframe, columnIndex, pattern, exportColumns = []) {}
 
