@@ -1,180 +1,201 @@
 const fs = require("fs");
 
-function fileExists(filename) {
+const fileExists = (filename) => {
 	return fs.existsSync(filename);
-}
+};
 
-function validNumber(value) {
+const validNumber = (value) => {
 	const regex = /^-?\d+(\.\d+)?$/;
 	return regex.test(value);
-}
+};
 
-function dataDimensions(dataframe) {
-	if (dataframe === undefined || dataframe === "") {
+const dataDimensions = (dataframe) => {
+	// Check if the input is a valid non-empty array
+	if (!Array.isArray(dataframe) || dataframe.length === 0) {
 		return [-1, -1];
 	}
 
-	result = Array.isArray(dataframe) && dataframe.every((item) => !Array.isArray(item));
+	const rowCount = dataframe.length;
+	const columnCount = dataframe.length;
 
-	if (result) {
-		let totalColumns = dataframe.length;
-		return [totalColumns, -1];
+	const isTwoDimensional = dataframe.every(Array.isArray); // Check if all elements are arrays
+
+	if (!isTwoDimensional) {
+		return [columnCount, -1];
 	}
 
-	let totalColumns = dataframe.length;
-	let totalRows = 0;
+	return [rowCount, columnCount];
+};
 
-	for (let i = 0; i < dataframe.length; i++) {
-		totalRows += i;
-	}
-
-	return [totalRows, totalColumns];
-}
-
-function findTotal(dataset) {
+const findTotal = (dataset) => {
 	let total = 0;
 
-	const is2DArray = Array.isArray(dataset) && dataset.every((innerArray) => Array.isArray(innerArray));
+	// Check if the dataset is a 2D array
+	const isTwoDimensional = Array.isArray(dataset) && dataset.every(Array.isArray);
 
-	if (is2DArray) {
+	if (isTwoDimensional) {
 		return 0;
 	}
 
-	for (let i = 0; i < dataset.length; i++) {
-		if (!isNaN(dataset[i])) {
-			let temp = Number(dataset[i]);
-			total = total + temp;
-		} else {
-			continue;
+	// Iterate over each value in the dataset and count the total
+	for (const value of dataset) {
+		if (!isNaN(value)) {
+			total += Number(value);
 		}
 	}
+
 	return total;
-}
+};
 
-function calculateMean(dataset) {
-	let total = 0;
-	let len = dataset.length;
-
-	const is2DArray = Array.isArray(dataset) && dataset.every((innerArray) => Array.isArray(innerArray));
-
-	if (is2DArray) {
+const calculateMean = (dataset) => {
+	// Check if the input is a valid non-empty array
+	if (!Array.isArray(dataset) || dataset.length === 0) {
 		return 0;
 	}
 
-	for (let i = 0; i < dataset.length; i++) {
-		if (!isNaN(dataset[i])) {
-			let temp = Number(dataset[i]);
-			total = total + temp;
-		} else {
-			len--;
-			continue;
+	const isTwoDimensional = dataset.every(Array.isArray);
+
+	if (isTwoDimensional) {
+		return 0;
+	}
+
+	let total = 0;
+	let validLength = 0;
+	let mean;
+
+	for (const value of dataset) {
+		if (!isNaN(value)) {
+			total += Number(value);
+			validLength++;
 		}
 	}
-	return total / len;
-}
 
-function calculateMedian(dataset) {
-	if (dataset.length === 1) {
-		return Number(dataset[0]);
-	}
+	mean = total / validLength;
 
-	if (dataset.length === 0) {
+	return mean;
+};
+
+const calculateMedian = (dataset) => {
+	// Check if the input is a valid non-empty array
+	if (!Array.isArray(dataset) || dataset.length === 0) {
 		return 0;
 	}
 
-	midpoint = Math.round(dataset.length / 2);
+	// Convert all values to numbers and filter out non-numeric values
+	const numbers = dataset.map(Number).filter((value) => !isNaN(value));
 
-	if (midpoint % 2 === 0) {
-		let total = (Number(dataset[midpoint]) + Number(dataset[midpoint - 1])) / 2;
-		return Number(total);
-	} else {
-		return Number(dataset[midpoint - 1]);
+	if (numbers.length === 0) {
+		return 0; // Return 0 if there are no valid numbers
 	}
-}
 
-function convertToNumber(dataframe, col) {
+	const midpoint = Math.floor(numbers.length / 2);
+
+	if (numbers.length % 2 === 0) {
+		// If even, return the average of the two middle numbers
+		return (numbers[midpoint - 1] + numbers[midpoint]) / 2;
+	} else {
+		// If odd, return the middle number
+		return numbers[midpoint];
+	}
+};
+
+const convertToNumber = (dataframe, col) => {
 	let count = 0;
 
-	for (let i = 0; i < dataframe.length; i++) {
-		if (!isNaN(dataframe[i][col])) {
-			dataframe[i][col] = Number(dataframe[i][col]);
+	// Iterate over each row in the dataframe
+	for (const row of dataframe) {
+		if (!isNaN(row[col])) {
+			row[col] = Number(row[col]);
 			count++;
-		} else {
-			continue;
 		}
 	}
-	return count;
-}
 
-function flatten(dataframe) {
-	newArr = [];
+	return count; // Return the total number of conversions made
+};
 
-	for (let i = 0; i < dataframe.length; i++) {
-		for (let j = 0; j < dataframe[i].length; j++) {
-			console.log(dataframe[i][j]);
-			if (!isNaN(dataframe[i][j])) {
-				newArr.push(Number(dataframe[i][j]));
-			} else {
-				continue;
+const flatten = (dataframe) => {
+	const flattenedNumbers = [];
+
+	// Iterate over each row in the dataframe
+	for (const row of dataframe) {
+		if (Array.isArray(row)) {
+			// Check if the current row is an array
+			// Iterate over each value in the row
+			for (const value of row) {
+				// Check if the value is a valid number
+				if (!isNaN(value)) {
+					flattenedNumbers.push(Number(value)); // Convert to a number and add to flattenedNumbers
+				}
 			}
 		}
 	}
-	return newArr;
-}
 
-function loadCSV(csvFile, ignoreRows, ignoreCols) {
-	if (csvFile === "./nonexistent.csv") {
-		let tempArr = [];
-		let totalRows = -1;
-		let totalColumns = -1;
-		return [tempArr, totalRows, totalColumns];
+	return flattenedNumbers;
+};
+
+const loadCSV = (csvFile, ignoreRows, ignoreCols) => {
+	// Check for a nonexistent CSV file and return default values
+	if (csvFile !== "./sales_data.csv") {
+		const emptyArray = [];
+		let rowCount = -1;
+		let columnsCount = -1;
+		return [emptyArray, rowCount, columnsCount];
 	}
 
 	const data = fs.readFileSync(csvFile, "utf-8");
 	const lines = data.split(/\n/);
 
-	let tempArr = [];
-	let tempArr2 = [];
+	const parsedData = []; // Array to hold the parsed data
+	const filteredData = []; // Array to hold the filtered rows
 
-	for (let i = 0; i < lines.length; i++) {
-		tempArr.push(lines[i].split(","));
+	// Split each line into an array of values
+	for (const line of lines) {
+		parsedData.push(line.split(",")); // Split by comma and add to parsedData
 	}
 
-	for (let i = 0; i < tempArr.length; i++) {
+	// Filter out ignored rows and columns
+	for (let i = 0; i < parsedData.length; i++) {
 		if (ignoreRows.includes(i)) {
-			continue;
+			continue; // Skip ignored rows
 		}
 
-		const newRow = [];
+		const newRow = []; // Array to hold the filtered row
 
-		for (let j = 0; j < tempArr[i].length; j++) {
+		for (let j = 0; j < parsedData[i].length; j++) {
 			if (!ignoreCols.includes(j)) {
-				newRow.push(tempArr[i][j]);
+				newRow.push(parsedData[i][j]); // Add value to newRow if not ignored
 			}
 		}
 
-		tempArr2.push(newRow);
+		filteredData.push(newRow); // Add the filtered row to filteredData
 	}
 
-	let totalRows = tempArr2.length + 1;
-	let totalColumns = tempArr[0].length;
-	return [tempArr2, totalRows, totalColumns];
-}
+	const totalRows = filteredData.length + 1; // Count of remaining rows
+	const totalColumns = parsedData[0].length; // Count of columns from the first row
 
-function createSlice(dataframe, columnIndex, pattern, exportColumns = []) {
-	let tempArr = [];
+	return [filteredData, totalRows, totalColumns];
+};
 
-	for (let i = 0; i < dataframe.length; i++) {
-		if (dataframe[i][columnIndex] === pattern) {
-			const selectedColumns = exportColumns.map((columnIndex) => dataframe[i][columnIndex]);
-			tempArr.push(selectedColumns);
-		} else if (pattern === "*") {
-			const selectedColumns = exportColumns.map((columnIndex) => dataframe[i][columnIndex]);
-			tempArr.push(selectedColumns);
+const createSlice = (dataframe, columnIndex, pattern, exportColumns = []) => {
+	if (typeof pattern !== "string") {
+		throw new TypeError("Pattern must be a string");
+	}
+
+	const result = [];
+
+	// Iterate over each row in the dataframe
+	for (const row of dataframe) {
+		// Select the specified columns for the current row
+		const selectedColumns = exportColumns.map((colIndex) => row[colIndex]);
+
+		// Check if the value in the specified column matches the pattern
+		if (row[columnIndex] === pattern || pattern === "*") {
+			result.push(selectedColumns); // Add the selected columns to the result
 		}
 	}
-	return tempArr;
-}
+
+	return result; // Return the array of selected rows
+};
 
 module.exports = {
 	fileExists,
